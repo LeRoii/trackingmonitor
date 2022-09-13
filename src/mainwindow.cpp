@@ -6,10 +6,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
-    QImage *img=new QImage;
-    img->load("/home/zpwang/code/trackingboard/1.png");
-    ui->videoDispLabel->setPixmap(QPixmap::fromImage(*img));
 }
 
 MainWindow::~MainWindow()
