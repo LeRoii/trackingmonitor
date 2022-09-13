@@ -24,7 +24,7 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="videoDispLabel">
         <property name="minimumSize">
          <size>
           <width>1024</width>
