@@ -34,6 +34,9 @@
         <property name="text">
          <string/>
         </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+        </property>
        </widget>
       </item>
       <item>
@@ -137,10 +140,58 @@
           <property name="orientation">
            <enum>Qt::Vertical</enum>
           </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Preferred</enum>
+          </property>
           <property name="sizeHint" stdset="0">
            <size>
             <width>20</width>
             <height>30</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="groupBox">
+          <property name="title">
+           <string/>
+          </property>
+          <layout class="QFormLayout" name="formLayout">
+           <item row="0" column="0">
+            <widget class="QLabel" name="ip_lable">
+             <property name="text">
+              <string>目标ip</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLineEdit" name="ip_lineEdit"/>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="port_label">
+             <property name="text">
+              <string>目标端口</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QLineEdit" name="port_lineEdit"/>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Preferred</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
            </size>
           </property>
          </spacer>
@@ -175,7 +226,23 @@
          </widget>
         </item>
         <item row="0" column="1" colspan="2">
-         <widget class="QComboBox" name="showvideo_comboBox"/>
+         <widget class="QComboBox" name="showvideo_comboBox">
+          <item>
+           <property name="text">
+            <string>可见光</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>红外</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>融合</string>
+           </property>
+          </item>
+         </widget>
         </item>
         <item row="0" column="0">
          <widget class="QLabel" name="showvideo_label_2">
@@ -209,7 +276,18 @@
          </widget>
         </item>
         <item row="0" column="5" colspan="2">
-         <widget class="QComboBox" name="sysmode_combox"/>
+         <widget class="QComboBox" name="sysmode_combox">
+          <item>
+           <property name="text">
+            <string>定位</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>跟踪</string>
+           </property>
+          </item>
+         </widget>
         </item>
         <item row="1" column="0" colspan="2">
          <widget class="QCheckBox" name="fusion_checkBox">
@@ -232,6 +310,13 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>
