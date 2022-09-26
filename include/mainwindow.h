@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include "camprotocol.h"
 #include "h264_decoder.h"
+#include <windows.h>
 
 namespace Ui {
 class MainWindow;
@@ -19,6 +20,16 @@ public:
     uchar *predata = new uchar[10];
 
     QImage Matimgtoqt(const cv::Mat &src);
+
+    AVPacket *pAVPacket = av_packet_alloc();
+
+    QString cur_ip;
+
+    int cur_port;
+
+
+    void rtsp_open();
+
     ~MainWindow();
 
 
@@ -45,6 +56,12 @@ private slots:
     void on_track_checkBox_clicked(bool checked);
 
     void on_sysmode_combox_currentIndexChanged(int index);
+
+    void opencvrtsp();
+
+    void on_ip_lineEdit_editingFinished();
+
+    void on_port_lineEdit_editingFinished();
 
 private:
     Ui::MainWindow *ui;

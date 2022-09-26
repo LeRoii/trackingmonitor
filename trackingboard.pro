@@ -61,16 +61,18 @@ SOURCES += \
     src/camprotocol.cpp \
     src/mythread.cpp \
     src/h264_decoder.cpp \
-    src/rtspclient.cpp \
-    src/mediasession.cpp
+#    src/rtspclient.cpp \
+#    src/mediasession.cpp
+#    src/ffmpeg.cpp
 
 HEADERS += \
     include/mainwindow.h \
     include/camprotocol.h \
     include/mythread.h \
     include/h264_decoder.h \
-    include/rtspclient.h \
-    include/mediasession.h
+#    include/rtspclient.h \
+#    include/mediasession.h
+#    include/ffmpeg.h
 
 FORMS += \
     ui/mainwindow.ui

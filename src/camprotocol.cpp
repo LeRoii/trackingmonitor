@@ -239,7 +239,7 @@ camprotocol::camprotocol()
 //    img_Rec_Buffer_ptr = new uchar[BUFFER_SIZE];
 //    img_freeBytes = new QSemaphore(BUFFER_SIZE);
 //    img_usedBytes = new QSemaphore(0);
-    const QString ip = "192.168.1.100";
+    const QString ip = "192.168.1.102";
     //const QString ip = "192.168.3.102";
     qDebug()<<ip;
 

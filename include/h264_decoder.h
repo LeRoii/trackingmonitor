@@ -2,13 +2,16 @@
 #define CH264DECODER_H
 
 #include <string.h>
+#include <QString>
 #include <opencv2/opencv.hpp>
 #include <QFile>
 #include <QDebug>
 #include <stdio.h>
+#include <QImage>
 //C++引用C语言的头文件
 extern "C"
 {
+#include "libswscale/swscale.h"
 #include "libavformat/avformat.h"
 #include "libswresample/swresample.h"
 #include "libavutil/opt.h"
@@ -61,6 +64,8 @@ public:
     *************************************************/
     void unInitial();
     void readfile();
+
+    void rtsp_open();
 
 private:
     int avframe_to_cvmat(AVFrame *frame,cv::Mat& res);
