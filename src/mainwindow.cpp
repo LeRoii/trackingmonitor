@@ -3,18 +3,25 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    m_isMousePress(false),
+    m_isdraw(true)
 {
     ui->setupUi(this);
     this->initApplication();
 
+    ui->ip_lineEdit->setText("192.168.1.1");
+
+    ui->videoDispLabel->installEventFilter(this);
+    timer1 -> setTimerType(Qt::PreciseTimer);
+    connect(timer1,SIGNAL(timeout()),this,SLOT(sendcmd()));
+    timer1->start(1000*60*3);
     camhandle = new camprotocol();
     decoder = new CH264Decoder();
-
-    //camhandle->setMai(this);
+    initwindow();
     //this->opencvrtsp();
     //decoder->rtsp_open();
-    this->rtsp_open();
+    //this->rtsp_open();
 }
 
 MainWindow::~MainWindow()
@@ -22,7 +29,10 @@ MainWindow::~MainWindow()
     delete ui;
     delete camhandle;
     delete decoder;
+    delete timer1;
 }
+
+
 
 QImage MainWindow::Matimgtoqt(const cv::Mat &src)
 {
@@ -85,158 +95,343 @@ QImage MainWindow::Matimgtoqt(const cv::Mat &src)
 
 }
 
+void MainWindow::initwindow()
+{
+    this->setMouseTracking(true);
+    //this->setWindowFlags(Qt::FramelessWindowHint);
+    setWindowState(Qt::WindowActive);
+}
+
+void MainWindow::updatebbox()
+{
+    predata[10] = uchar(startpoint.x()>>8);
+    predata[11] = startpoint.x()&0xff;
+
+    predata[12] = uchar(startpoint.y()>>8);
+    predata[13] = startpoint.y()&0xff;
+
+    predata[14] = uchar(bbox_w>>8);
+    predata[15] = bbox_w&0xff;
+
+    predata[16] = uchar(bbox_h>>8);
+    predata[17] = bbox_h&0xff;
+
+    emit sendtcpdata(predata);
+}
+
+//void MainWindow::mousepress(QObject *obj,QEvent *event)
+//{
+
+//    if(obj==ui->videoDispLabel)
+//    {
+
+//        if(event->type()==QEvent::MouseButtonPress)
+//        {
+//            qDebug("mousepress");
+//            m_isMousePress = true;
+//            QMouseEvent *ev = static_cast<QMouseEvent *>(event);
+//            startpoint = ev->pos();
+//            qDebug()<<ev->pos();
+//        }
+//    }
+//    return this->mousepress(obj,event);
+//}
+
+//void MainWindow::mousemove(QObject *obj, QMouseEvent *event)
+//{
+//    if(obj==ui->videoDispLabel)
+//    {
+//        if(m_isMousePress)
+//        {
+//            qDebug()<<"painting";
+//            QMouseEvent *ev = static_cast<QMouseEvent *>(event);
+//            finishpoint = ev->pos();
+//            update();
+//        }
+//    }
+//    return this->mousemove(obj,event);
+//}
+
+//void MainWindow::mouserelease(QObject *obj, QMouseEvent *event)
+//{
+//    if(obj==ui->videoDispLabel)
+//    {
+//        if(event->type()==QEvent::MouseButtonRelease)
+//        {
+//            qDebug("mouserelease");
+//            QMouseEvent *ev = static_cast<QMouseEvent *>(event);
+//            finishpoint = ev->pos();
+//            m_isMousePress = false;
+//            qDebug()<<ev->pos();
+//        }
+//    }
+//    return this->mouserelease(obj,event);
+//}
+
+//void MainWindow::keypressEvent(QKeyEvent *event)
+//{
+
+//    if (event->key() == Qt::Key_Escape)
+//        {
+//            close();
+//        }
+//    if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
+//    {
+
+
+//        close();
+//    }
+//}
+
+
+
+bool MainWindow::eventFilter(QObject *obj, QEvent *event)
+{
+    if(obj==ui->videoDispLabel)
+    {
+        if(event->type()==QEvent::MouseButtonPress)
+        {
+            qDebug("mousepress");
+            m_isMousePress = true;
+            m_isdraw = true;
+            QMouseEvent *ev = static_cast<QMouseEvent *>(event);
+            startpoint = ev->pos();
+            qDebug()<<ev->pos();
+            return true;
+        }
+
+        if(event->type()==QEvent::MouseMove)
+        {
+            if(m_isMousePress)
+                    {
+                        qDebug()<<"painting";
+                        QMouseEvent *ev = static_cast<QMouseEvent *>(event);
+                        finishpoint = ev->pos();
+                        update();
+                    }
+        }
+
+        if(event->type()==QEvent::MouseButtonRelease)
+        {
+            qDebug("mouserelease");
+
+            QMouseEvent *ev = static_cast<QMouseEvent *>(event);
+            finishpoint = ev->pos();
+            m_isMousePress = false;
+            qDebug()<<ev->pos();
+
+            return true;
+        }
+
+
+        if(event->type()==QEvent::KeyPress)
+        {
+            if(!m_isMousePress)
+            {
+             QKeyEvent *key_event=static_cast<QKeyEvent *>(event);
+             if (key_event->key() == Qt::Key_Escape)
+                 {
+
+                 }
+             if (key_event->key() == Qt::Key_Return || key_event->key() == Qt::Key_Enter)
+             {
+                updatebbox();
+             }
+            }
+        }
+
+
+        return false;
+
+    }
+    return eventFilter(obj,event);
+}
+
+void MainWindow::sendcmd()
+{
+    emit sendtcpdata(predata);
+}
+
+
+void MainWindow::paintEvent(QPaintEvent *event)
+{
+//    if(m_isdraw)
+//    {
+    m_painter.begin(this);
+    m_painter.setPen(QPen(Qt::blue, 1, Qt::SolidLine, Qt::FlatCap));
+   // m_painter.setCompositionMode(QPainter::CompositionMode_DestinationOver);
+
+    if (m_isMousePress)
+    {
+        bbox_w = finishpoint.x()-startpoint.x();
+        bbox_h = finishpoint.y()-startpoint.y();
+        QRectF rectangle(startpoint.x(), startpoint.y(), bbox_w,  bbox_h);
+        qDebug()<< finishpoint.x()<<finishpoint.y();
+        m_painter.drawRect(rectangle);
+    }
+    ui->videoDispLabel->show();
+
+    m_painter.end();
+//    }
+
+//    else {
+//        m_painter.begin(this);
+//        m_painter.setCompositionMode(QPainter::CompositionMode_Clear);
+//        m_painter.drawRect(rectangle);
+//    }
+}
+
 void MainWindow::rtsp_open()
 {
 
-           AVFormatContext* format_ctx = NULL;
-           //AVFormatContext* ptr = NULL;
-           AVCodecContext *pAVCodecContext_video = nullptr;
-           const AVCodec *pAVCodec_video = nullptr;
-            AVFrame *pAVFrame_video,*pAVFrameRGB32_video;
-             char url[] = "rtsp://admin:admin@192.168.1.108";
+   // QCoreApplication::processEvents();
 
-           format_ctx = avformat_alloc_context();
-           AVCodecParameters *pAVCodePar_video = avcodec_parameters_alloc();
-          // AVPacket *pAVPacket = av_packet_alloc();                                  // ffmpeg单帧数据包
-           pAVFrame_video = av_frame_alloc();                                 // ffmpeg单帧缓存
-           pAVFrameRGB32_video = av_frame_alloc();                            // ffmpeg单帧缓存转换颜色空间后的缓存
-           AVCodecParserContext *pAVCodeParseContext_video = nullptr;
-           struct SwsContext *pSwsContext_video = nullptr;                             // ffmpeg编码数据格式转换
-           AVDictionary * opts = nullptr;
+    AVFormatContext *pFormatCtx = NULL;
+    AVCodecContext *pCodecCtx = NULL;
+    const AVCodec *pCodec = NULL;
+    AVFrame *pFrame,*pFrameRGB;
+    AVPacket *packet;
+    struct SwsContext *img_convert_ctx;
 
-           int ret = -1;
-           long long numBytes = 0;                                                           // 解码后的数据长度
-           uchar *outBuffer = nullptr;                                                // 解码后的数据存放缓存区
-           //av_register_all();
+    unsigned char *out_buffer;
+    int i,videoIndex;
+    int ret;
+    char errors[1024] = "";
 
-        // open rtsp: Open an input stream and read the header. The codecs are not opened
-           //const char* url = "rtsp://admin:genepoint2020@192.168.100.14:554/cam/realmonitor?channel=1&subtype=0";
-           av_dict_set(&opts, "rtsp_transport", "tcp", 0);
-           av_dict_set(&opts, "stimeout", "2000000", 0);
-           // audio/video stream index
-           int video_stream_index = -1;
-          ret = avformat_open_input(&format_ctx, "rtsp://admin:admin@192.168.1.108", nullptr, nullptr);
-               if (ret != 0)
-               {
-                   printf("Can not open this file");
-                   //return;
-               }
-               // Read packets of a media file to get stream information
-               ret = avformat_find_stream_info(format_ctx, nullptr);
-               if (ret < 0) {
-                   printf("Unable to get stream info");
-                  // return ;
-               }
+    //char filepath[] = "demo.avi";
+    //rtsp地址:
+    char url[] = "rtsp://192.168.1.114:8554/live";
+    //char url[] = "rtsp://admin:admin@192.168.1.108";
 
-               fprintf(stdout, "Number of elements in AVFormatContext.streams: %d\n", format_ctx->nb_streams);
-               for (int i = 0; i < format_ctx->nb_streams; ++i) {
-                   const AVStream *stream = format_ctx->streams[i];
-                   fprintf(stdout, "type of the encoded data: %d\n", stream->codecpar->codec_id);
-                   if (stream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
-                       video_stream_index = i;
-                       // 对找到的视频流寻解码器
-                       pAVCodePar_video = stream->codecpar;
-                       pAVCodec_video = avcodec_find_decoder(pAVCodePar_video->codec_id);
-                       if (!pAVCodec_video) {
-                           video_stream_index = -1;
-                           break;
-                       }
-                       pAVCodeParseContext_video = av_parser_init(pAVCodec_video->id);
-                       if (!pAVCodeParseContext_video) {
-                           video_stream_index = -1;
-                           break;
-                       }
-                       pAVCodecContext_video = avcodec_alloc_context3(pAVCodec_video);
-                        avcodec_parameters_to_context(pAVCodecContext_video,format_ctx->streams[video_stream_index]->codecpar);
-                       if (avcodec_open2(pAVCodecContext_video, pAVCodec_video, NULL) < 0) {
-                           video_stream_index = -1;
-                           break;
-                       }
-                       fprintf(stdout, "dimensions of the video frame in pixels: width: %d, height: %d, pixel format: %d\n",
-                               stream->codecpar->width, stream->codecpar->height, stream->codecpar->format);
-
-                   }
+    //初始化FFMPEG  调用了这个才能正常适用编码器和解码器
+    pFormatCtx = avformat_alloc_context();  //init FormatContext
+    //初始化FFmpeg网络模块
+    avformat_network_init();    //init FFmpeg network
 
 
-                                                     //解码后的h264数据转换成RGB32
-                   if(pAVCodecContext_video->pix_fmt==AV_PIX_FMT_NONE)
-                   {
-                       continue;
-                   }
+    //open Media File
+    ret = avformat_open_input(&pFormatCtx,url,NULL,NULL);
+    if(ret != 0){
+        av_strerror(ret,errors,sizeof(errors));
+        //cout <<"Failed to open video: ["<< ret << "]"<< errors << endl;
+        exit(ret);
+    }
 
+    //Get audio information
+    ret = avformat_find_stream_info(pFormatCtx,NULL);
+    if(ret != 0){
+        av_strerror(ret,errors,sizeof(errors));
+        //cout <<"Failed to get audio info: ["<< ret << "]"<< errors << endl;
+        exit(ret);
+    }
 
-                     pSwsContext_video = sws_getContext(pAVCodecContext_video->width, pAVCodecContext_video->height,
-                                   pAVCodecContext_video->pix_fmt,pAVCodecContext_video->width, pAVCodecContext_video->height,
-                                           AV_PIX_FMT_RGB32, SWS_BICUBIC, NULL, NULL, NULL);
-               }
-               numBytes = av_image_get_buffer_size(AV_PIX_FMT_RGB32, pAVCodecContext_video->width,pAVCodecContext_video->height,1);
-               //outBuffer = (uint8_t *) av_malloc(numBytes * sizeof(uint8_t));
-                outBuffer = (uchar *) av_malloc(numBytes);
-               av_image_fill_arrays(pAVFrameRGB32_video->data, pAVFrameRGB32_video->linesize, outBuffer, AV_PIX_FMT_RGB32, pAVCodecContext_video->width, pAVCodecContext_video->height, 1);
+    videoIndex = -1;
 
-               int av_size =  pAVCodecContext_video->width * pAVCodecContext_video->height;
+    ///循环查找视频中包含的流信息，直到找到视频类型的流
+    ///便将其记录下来 videoIndex
+    ///这里我们现在只处理视频流  音频流先不管他
+    for (i = 0; i < pFormatCtx->nb_streams; i++) {
+       // QCoreApplication::processEvents();
 
-               pAVPacket = (AVPacket *) malloc(sizeof(AVPacket));
+        if (pFormatCtx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
+            videoIndex = i;
+        }
+    }
 
-               av_dump_format(format_ctx,0,url,0);
-               av_new_packet(pAVPacket,av_size);
+    ///videoIndex-1 说明没有找到视频流
+    if (videoIndex == -1) {
+        printf("Didn't find a video stream.\n");
+        return;
+    }
 
-               int as = 0;
-               while(av_read_frame(format_ctx,pAVPacket)>=0)
-               {
-                   if(pAVPacket->stream_index==video_stream_index)
-                   {
-                       qDebug("a == %d\n",++as);
+    //配置编码上下文，AVCodecContext内容
+    //1.查找解码器
+    pCodec = avcodec_find_decoder(pFormatCtx->streams[videoIndex]->codecpar->codec_id);
+    //2.初始化上下文
+    pCodecCtx = avcodec_alloc_context3(pCodec);
+    //3.配置上下文相关参数
+    avcodec_parameters_to_context(pCodecCtx,pFormatCtx->streams[videoIndex]->codecpar);
+    //4.打开解码器
+    ret = avcodec_open2(pCodecCtx, pCodec, NULL);
+    if(ret != 0){
+        av_strerror(ret,errors,sizeof(errors));
+        //cout <<"Failed to open Codec Context: ["<< ret << "]"<< errors << endl;
+        exit(ret);
+    }
 
-                       int ret = avcodec_send_packet(pAVCodecContext_video, pAVPacket);
-                       int got_picture = avcodec_receive_frame(pAVCodecContext_video, pAVFrame_video);
-                       if (ret<0)
-                       {
-                           qDebug()<<"decode failed！！！";
-                       }
+    //初始化视频帧
+    pFrame = av_frame_alloc();
+    pFrameRGB = av_frame_alloc();
+    //为out_buffer申请一段存储图像的内存空间
+    out_buffer = (unsigned char*)av_malloc(av_image_get_buffer_size(AV_PIX_FMT_RGB32,pCodecCtx->width,pCodecCtx->height,1));
+    //实现AVFrame中像素数据和Bitmap像素数据的关联
+    av_image_fill_arrays(pFrameRGB->data,pFrameRGB->linesize, out_buffer,
+                   AV_PIX_FMT_RGB32,pCodecCtx->width, pCodecCtx->height,1);
+    //为AVPacket申请内存
+    packet = (AVPacket *)av_malloc(sizeof(AVPacket));
+    //打印媒体信息
+    av_dump_format(pFormatCtx,0,url,0);
+    //初始化一个SwsContext
+    img_convert_ctx = sws_getContext(pCodecCtx->width, pCodecCtx->height,
+                pCodecCtx->pix_fmt, pCodecCtx->width, pCodecCtx->height,
+                AV_PIX_FMT_RGB32, SWS_BICUBIC, NULL, NULL, NULL);
 
-                       if(!got_picture)
-                       {
-                           sws_scale(pSwsContext_video,(const unsigned char* const*)pAVFrame_video->data,pAVFrame_video->linesize
-                                     ,0,pAVCodecContext_video->height,pAVFrameRGB32_video->data,pAVFrameRGB32_video->linesize);
+    //设置视频label的宽高为视频宽高
+    ui->videoDispLabel->setGeometry(0, 0, pCodecCtx->width, pCodecCtx->height);
 
-                           QImage img((uchar*)pAVFrameRGB32_video->data[0],pAVCodecContext_video->width,
-                                   pAVCodecContext_video->height,QImage::Format_RGB32);
+    //读取帧数据，并通过av_read_frame的返回值确认是不是还有视频帧
+    while(av_read_frame(pFormatCtx,packet) >=0){
+        //判断视频帧
 
-                            ui->videoDispLabel->setPixmap(QPixmap::fromImage(img));
+        //QCoreApplication::processEvents();
+        if(packet->stream_index == videoIndex){
+            //解码视频帧
+            ret = avcodec_send_packet(pCodecCtx, packet);
+            ret = avcodec_receive_frame(pCodecCtx, pFrame);
+            if(ret != 0){
+                av_strerror(ret,errors,sizeof(errors));
+               // cout <<"Failed to decode video frame: ["<< ret << "]"<< errors << endl;
+            }
+            if (ret == 0) {
+                //处理图像数据
+                sws_scale(img_convert_ctx,
+                                        (const unsigned char* const*) pFrame->data,
+                                        pFrame->linesize, 0, pCodecCtx->height, pFrameRGB->data,
+                                        pFrameRGB->linesize);
+                QImage img((uchar*)pFrameRGB->data[0],pCodecCtx->width,pCodecCtx->height,QImage::Format_RGB32);
 
-                            Sleep(1000);
-                       }
+                ui->videoDispLabel->setPixmap(QPixmap::fromImage(img));
+                //释放前需要一个延时
+                //Delay(1);
+            }
+        }
+        //释放packet空间
+        av_packet_unref(packet);
+    }
 
-                   }
+    //close and release resource
+    av_free(out_buffer);
+    av_free(pFrameRGB);
 
-                   av_packet_unref(pAVPacket);
-               }
-
-
-
-
-
-           av_parser_close(pAVCodeParseContext_video);
-           av_frame_free(&pAVFrame_video);
-           av_frame_free(&pAVFrameRGB32_video);
-           av_free(outBuffer);
-           av_free(pSwsContext_video);
-           avcodec_free_context(&pAVCodecContext_video);
-           avformat_close_input(&format_ctx);
-           exit(0);
-
+    sws_freeContext(img_convert_ctx);
+    avcodec_close(pCodecCtx);
+    avcodec_free_context(&pCodecCtx);
+    avformat_close_input(&pFormatCtx);
+    exit(0);
 }
 
-void MainWindow::Showpic(QImage image)
+void MainWindow::Showpic(QImage image,int w,int h)
 {
+
+   // ui->videoDispLabel->setGeometry(0, 0, w, h);
     ui->videoDispLabel->setPixmap(QPixmap::fromImage(image));
 }
 
-void MainWindow::getmsg(uchar num, quint16 x, quint16 y)
+void MainWindow::getmsg(uchar num, quint16 x, quint16 y,quint16 dis,quint8 dis1)
 {
     QString text;
-    text = "检测数目： "+QString::number(num)+"跟踪靶坐标："+QString::number(x)+","+QString::number(y);
+    text = "检测数目： "+QString::number(num)+"跟踪靶坐标："+QString::number(x)+","+QString::number(y)
+            +"距离："+QString::number(dis)+"."+QString::number(dis1);
     //ui->videoDispLabel->setText(text);
     ui->statusBar->showMessage(text);
 }
@@ -249,7 +444,7 @@ void MainWindow::getshowbuff(uchar *buff,int len)
     decoder->decode(buff,len,res);
     image = this->Matimgtoqt(res);
     qDebug()<< QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz");
-    this->Showpic(image);
+    //this->Showpic(image);
 }
 
 
@@ -265,6 +460,14 @@ void MainWindow::initApplication()
     predata[7] = uchar(0x00);
     predata[8] = uchar(0x00);
     predata[9] = uchar(0x00);
+    predata[10] = uchar(0x00);
+    predata[11] = uchar(0x00);
+    predata[12] = uchar(0x00);
+    predata[13] = uchar(0x00);
+    predata[14] = uchar(0x00);
+    predata[15] = uchar(0x00);
+    predata[16] = uchar(0x00);
+    predata[17] = uchar(0x00);
     emit sendtcpdata(predata);
 }
 
@@ -410,4 +613,10 @@ void MainWindow::on_ip_lineEdit_editingFinished()
 void MainWindow::on_port_lineEdit_editingFinished()
 {
     cur_port = ui->port_lineEdit->text().toInt();
+}
+
+void MainWindow::on_connect_clicked()
+{
+   camhandle->setMai(this,cur_ip,cur_port);
+   //this->rtsp_open();
 }

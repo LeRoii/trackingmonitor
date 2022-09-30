@@ -25,7 +25,7 @@ DEPENDPATH += $$PWD/../../opencv/opencv-3.4.0/build/install/include
 # deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
 
-win32 {
+win32 {····
 INCLUDEPATH += $$PWD/ffmpeg-5.0.1-full_build-shared/include
 LIBS += $$PWD/ffmpeg-5.0.1-full_build-shared/lib/avformat.lib   \
         $$PWD/ffmpeg-5.0.1-full_build-shared/lib/avcodec.lib    \

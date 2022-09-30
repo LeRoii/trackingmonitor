@@ -3,6 +3,7 @@
 mythread::mythread()
 {
     Run_stopped = false;
+    Tcp_send = false;
     Run = false;
 
     Writer_Ptr = 0;
@@ -17,6 +18,14 @@ mythread::~mythread()
 {
 
 }
+
+//void Delay(int msec)
+//{
+//    QTime dieTime = QTime::currentTime().addMSecs(msec);
+//    while(QTime::currentTime() < dieTime){
+//        QCoreApplication::processEvents(QEventLoop::AllEvents,100);
+//    }
+//}
 
 void mythread::set_Rec_Buffer_ptr(uchar *x_Rec_Buffer)
 {
@@ -35,7 +44,7 @@ void mythread::set_usedBytes_ptr(QSemaphore *x_usedBytes)
 
 void mythread::gettcpdata(uchar *pdata)
 {
-    for (int i = 0;i<10;i++) {
+    for (int i = 0;i<18;i++) {
         data[i] = pdata[i];
     }
     Tcp_send = true;
