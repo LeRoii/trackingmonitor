@@ -2,12 +2,11 @@
 #define CAMPROTOCOL_H
 
 #include <QApplication>
-#include <QTcpSocket>
-#include <QTcpServer>
+
 #include "mythread.h"
 #include "h264_decoder.h"
 
-#define BUFFER_SIZE 65535
+#define BUFFER_SIZE 65536
 #define NUM_SIZE 1600
 
 class cam;

@@ -55,7 +55,7 @@ signals:
     void sendtcpdata(uchar *data);
 
 private slots:
-    void getmsg(uchar num,quint16 x,quint16 y,quint16 dis,quint8 dis1);
+    void getmsg(uchar num,qint16 x,qint16 y,quint16 dis,quint8 dis1);
 
     void getshowbuff(uchar *buff,int len);
 

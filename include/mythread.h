@@ -3,13 +3,14 @@
 
 #include <QThread>
 #include <QSemaphore>
-#include <QSerialPortInfo>
-#include <QSerialPort>
+#include <QTcpSocket>
+#include <QTcpServer>
 #include <QDebug>
 #include <QTime>
 #include <QApplication>
 #include <QImage>
 #include <windows.h>
+//#include <QtNetwork>
 
 
 class mythread : public QThread
@@ -33,12 +34,13 @@ public:
     quint16 Reader_Ptr;
     quint16 Pre_reader_Ptr;
 
-    volatile bool Run_stopped;
+    bool Run_stopped;
     volatile bool Run;
     volatile bool Tcp_send;
     volatile bool ctr_send;
 
     uchar *data = new uchar[18];
+    QTcpSocket *tcpsocket;
     QString ctrcmd;
     QString m_ip;
     quint16 m_port;
@@ -49,7 +51,7 @@ public slots:
     void gettcpdata(uchar *pdata);
 
 signals:
-    void sendmsgtomain(uchar num,quint16 x, quint16 y ,quint16 dis,quint8 dis1);
+    void sendmsgtomain(uchar num,qint16 x, qint16 y ,quint16 dis,quint8 dis1);
     void sendshowbuff(uchar* showbuff,int len);
     void sendimg(QImage img , int w,int h);
 };

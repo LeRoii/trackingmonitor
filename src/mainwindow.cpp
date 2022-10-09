@@ -15,7 +15,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->videoDispLabel->installEventFilter(this);
     timer1 -> setTimerType(Qt::PreciseTimer);
     connect(timer1,SIGNAL(timeout()),this,SLOT(sendcmd()));
-    timer1->start(1000*60*3);
+    //timer1->start(1000*60*3);
     camhandle = new camprotocol();
     decoder = new CH264Decoder();
     initwindow();
@@ -29,6 +29,7 @@ MainWindow::~MainWindow()
     delete ui;
     delete camhandle;
     delete decoder;
+    timer1->stop();
     delete timer1;
 }
 
@@ -427,7 +428,7 @@ void MainWindow::Showpic(QImage image,int w,int h)
     ui->videoDispLabel->setPixmap(QPixmap::fromImage(image));
 }
 
-void MainWindow::getmsg(uchar num, quint16 x, quint16 y,quint16 dis,quint8 dis1)
+void MainWindow::getmsg(uchar num, qint16 x, qint16 y,quint16 dis,quint8 dis1)
 {
     QString text;
     text = "检测数目： "+QString::number(num)+"跟踪靶坐标："+QString::number(x)+","+QString::number(y)
@@ -454,7 +455,7 @@ void MainWindow::initApplication()
     predata[1] = uchar(0xAA);
     predata[2] = uchar(0x02);
     predata[3] = uchar(0x00);
-    predata[4] = uchar(0x05);
+    predata[4] = uchar(0x01);
     predata[5] = uchar(0x00);
     predata[6] = uchar(0x00);
     predata[7] = uchar(0x00);
@@ -500,10 +501,12 @@ void MainWindow::on_showvideo_comboBox_currentIndexChanged(int index)
 void MainWindow::on_camfocalen_lineEdit_editingFinished()
 {
     short focal_len = ui->camfocalen_lineEdit->text().toShort();
+    QString text = QString::number(focal_len,10);
     predata[4] = uchar(focal_len);
     qDebug("%x",predata[4]);
 
     emit sendtcpdata(predata);
+    ui->cam_focal_lenth_status_label->setText("x"+text);
 }
 
 void MainWindow::on_fusion_checkBox_clicked(bool checked)

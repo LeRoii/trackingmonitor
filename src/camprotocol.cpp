@@ -23,9 +23,17 @@ public:
 
         //char filepath[] = "demo.avi";
         //rtsp地址:
-        char url[] = "rtsp://192.168.168.200:8554/live";
-       // char url[] = "rtsp://192.168.1.108:8554/live";
-        //char url[] = "rtsp://admin:admin@192.168.1.108";
+       // char url[] = "rtsp://192.168.168.200:8554/live";
+        char url[] = "rtsp://192.168.1.112:8554/live";
+        qDebug()<<url;
+        QString url1 = "rtsp://"+m_ip+":8554/live";
+        QByteArray byte = url1.toLocal8Bit();
+        strcpy_s(url,byte.size()+1,byte.data());
+        qDebug()<<url;
+
+       // char url[] = "rtsp://"+m_ip+"/live";
+
+
 
         //初始化FFMPEG  调用了这个才能正常适用编码器和解码器
         pFormatCtx = avformat_alloc_context();  //init FormatContext
@@ -152,53 +160,32 @@ public:
     }
 };
 
-
-
-
 class cam : public mythread
 {
+
 public:
     void run() Q_DECL_OVERRIDE
     {
-        QTcpSocket *tcpsocket = new QTcpSocket();
-        char *Rec_Temp = new char[75000];
+        //QTcpSocket *tcpsocket = new QTcpSocket();
+        char *Rec_Temp = new char[65535];
         int Rec_len = 0;
 
         Run_stopped = false;
-       // Tcp_send = false;
 
         tcpsocket->abort();
+
        // tcpsocket->connectToHost("127.0.0.1",777);
         tcpsocket->connectToHost(m_ip,m_port);
-        qDebug()<<m_ip<<m_port;
-
-        while (!Run_stopped) {
-//            tcpsocket->abort();
+       // qDebug()<<m_ip<<m_port;
 //            tcpsocket->connectToHost(m_ip,m_port);
-
             if(tcpsocket->waitForConnected(3000))
             {
-                 if(Tcp_send)
-                 {
-                     /*发送指令*/
-                     qApp->processEvents();
-                     for (int i = 0;i<18;i++)
-                     {
-                        qDebug("%02x",data[i]);
-                     }
-
-                     int num = tcpsocket->write((char*)data,18);
-                     tcpsocket->flush();
-
-
-                     Tcp_send = false;
-                 }
-
+                while (!Run_stopped) {
+                 //qDebug()<< QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz")<<"start r1";
                  /*接收数据*/
-                // qDebug()<< QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz")<<"start r";
                  if(tcpsocket->waitForReadyRead(1))
                  {
-                    Rec_len = tcpsocket->read(Rec_Temp, 75000);
+                    Rec_len = tcpsocket->read(Rec_Temp, 65535);
 
                     qDebug()<<"rec_len:"<<Rec_len;
 
@@ -212,6 +199,7 @@ public:
                                 Writer_Ptr = 0;
 
                             m_usedBytes->release(1);
+                            qDebug()<< QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz")<<m_usedBytes->available();
 
                             i++;
                         }
@@ -219,23 +207,23 @@ public:
                         {
                             usleep(1);
 
-                            if (Run_stopped)
-                                break;
+//                            if (Run_stopped)
+//                                break;
                         }
                     }
                 }
-                // qDebug()<< QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz")<<"finish r";
+
+            }
 
             }
             else
             {
                 qDebug()<<"连接失败";
-            }
-        }
-
-        tcpsocket->close();
-        delete tcpsocket;
-        Run_stopped = true;
+                tcpsocket->close();
+                delete tcpsocket;
+                delete [] Rec_Temp;
+                Run_stopped = true;
+            }      
     }
 
 
@@ -248,8 +236,8 @@ public:
     {
         uchar *Pre_Decoder = new uchar[11];
         uchar detect_num = 0;
-        quint16 tracker_x = 0;
-        quint16 tracker_y = 0;
+        qint16 tracker_x = 0;
+        qint16 tracker_y = 0;
         quint16 distance = 0;
         quint8 distance1 = 0;
 
@@ -257,6 +245,8 @@ public:
 
         while(!Run_stopped)
         {
+
+         //   qDebug()<<"decoder-----";
             if(m_usedBytes->tryAcquire(11,1))
             {
 
@@ -350,13 +340,13 @@ public:
 //                        len = 0;
 //                        ptr = 0;
                         Reader_Ptr = Pre_reader_Ptr;
-                        m_freeBytes->release(8);
+                        m_freeBytes->release(11);
 
                     }
                     else {
                         Reader_Ptr++;
 
-                        m_usedBytes->release(5);
+                        m_usedBytes->release(8);
                         m_freeBytes->release(3);
                     }
                  }
@@ -364,7 +354,7 @@ public:
                  else {
                      Reader_Ptr++;
 
-                     m_usedBytes->release(7);
+                     m_usedBytes->release(10);
                      m_freeBytes->release(1);
                  }
             }
@@ -376,24 +366,24 @@ public:
     }
 };
 
-class img_decode : public mythread
-{
-public:
-    void run() Q_DECL_OVERRIDE
-    {
-        Run_stopped = false;
+//class img_decode : public mythread
+//{
+//public:
+//    void run() Q_DECL_OVERRIDE
+//    {
+//        Run_stopped = false;
         
-        uchar *Pre_Decoder = new uchar[BUFFER_SIZE];
+//        uchar *Pre_Decoder = new uchar[BUFFER_SIZE];
         
-        while(!Run_stopped)
-        {
-            if (m_usedBytes->tryAcquire(19, 1))
-            {
+//        while(!Run_stopped)
+//        {
+//            if (m_usedBytes->tryAcquire(19, 1))
+//            {
                 
-            }
-        }
-    }
-};
+//            }
+//        }
+//    }
+//};
         
 
 
@@ -408,7 +398,7 @@ camprotocol::camprotocol()
 //    img_usedBytes = new QSemaphore(0);
     const QString ip = "192.168.1.114";
     //const QString ip = "192.168.3.102";
-    qDebug()<<ip;
+    //qDebug()<<ip;
 
 
     camera = new cam();
@@ -425,6 +415,8 @@ camprotocol::camprotocol()
     decoder->set_usedBytes_ptr(usedBytes);
 
     shower = new rtsp();
+//    shower->m_ip.clear();
+//    shower->m_ip = ip;
 
 //    img = new cam();
 //    img->set_Rec_Buffer_ptr(img_Rec_Buffer_ptr);
@@ -467,6 +459,10 @@ void camprotocol::stopRun()
 {
     camera->Run_stopped = true;
     camera->wait();
+    decoder->Run_stopped = true;
+    decoder->wait();
+    shower->Run_stopped = true;
+    shower->wait();
 }
 
 void camprotocol::setMai(QObject *qMain, const QString ip, quint16 port)
@@ -474,6 +470,8 @@ void camprotocol::setMai(QObject *qMain, const QString ip, quint16 port)
     camera->m_ip.clear();
     camera->m_ip = ip;
     camera->m_port = port;
+    shower->m_ip.clear();
+    shower->m_ip = ip;
     this->connectToMain(qMain);
     this->startRun();
 }
@@ -485,12 +483,13 @@ void camprotocol::startRun()
     camera->start(QThread::TimeCriticalPriority);
     decoder->start(QThread::TimeCriticalPriority);
     shower->start(QThread::TimeCriticalPriority);
+
 }
 
 void camprotocol::connectToMain(QObject *Main_Obj)
 {
         QObject::connect(Main_Obj,SIGNAL(sendtcpdata(uchar *)),camera,SLOT(gettcpdata(uchar *)),Qt::QueuedConnection);
-        QObject::connect(decoder,SIGNAL(sendmsgtomain(uchar,quint16,quint16,quint16,quint8)),Main_Obj,SLOT(getmsg(uchar,quint16,quint16,quint16,quint8))
+        QObject::connect(decoder,SIGNAL(sendmsgtomain(uchar,qint16,qint16,quint16,quint8)),Main_Obj,SLOT(getmsg(uchar,qint16,qint16,quint16,quint8))
                          ,Qt::QueuedConnection);
         QObject::connect(decoder,SIGNAL(sendshowbuff(uchar*,int)),Main_Obj,SLOT(getshowbuff(uchar *,int))
                          ,Qt::QueuedConnection);

@@ -5,6 +5,7 @@ mythread::mythread()
     Run_stopped = false;
     Tcp_send = false;
     Run = false;
+    tcpsocket = new QTcpSocket();
 
     Writer_Ptr = 0;
     Reader_Ptr = 0;
@@ -16,7 +17,7 @@ mythread::mythread()
 
 mythread::~mythread()
 {
-
+    //delete tcpsocket;
 }
 
 //void Delay(int msec)
@@ -48,4 +49,7 @@ void mythread::gettcpdata(uchar *pdata)
         data[i] = pdata[i];
     }
     Tcp_send = true;
+
+    tcpsocket->write((char*)data,18);
+    tcpsocket->flush();
 }

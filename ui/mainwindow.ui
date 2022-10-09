@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1280</width>
-    <height>767</height>
+    <width>1600</width>
+    <height>960</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -27,8 +27,14 @@
        <widget class="QLabel" name="videoDispLabel">
         <property name="minimumSize">
          <size>
-          <width>1024</width>
-          <height>576</height>
+          <width>1280</width>
+          <height>720</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>1280</width>
+          <height>720</height>
          </size>
         </property>
         <property name="focusPolicy">
@@ -174,7 +180,14 @@
             </widget>
            </item>
            <item row="0" column="1">
-            <widget class="QLineEdit" name="ip_lineEdit"/>
+            <widget class="QLineEdit" name="ip_lineEdit">
+             <property name="minimumSize">
+              <size>
+               <width>112</width>
+               <height>0</height>
+              </size>
+             </property>
+            </widget>
            </item>
            <item row="1" column="0">
             <widget class="QLabel" name="port_label">
@@ -220,10 +233,17 @@
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
        <layout class="QGridLayout" name="gridLayout">
-        <item row="0" column="7">
-         <widget class="QLabel" name="camfocallen_label">
+        <item row="0" column="3" colspan="2">
+         <widget class="QLabel" name="sysmode_label_2">
           <property name="text">
-           <string>可见光焦距:</string>
+           <string>系统状态:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="showvideo_label_2">
+          <property name="text">
+           <string>显示画面:</string>
           </property>
          </widget>
         </item>
@@ -234,10 +254,38 @@
           </property>
          </widget>
         </item>
+        <item row="0" column="5" colspan="2">
+         <widget class="QComboBox" name="sysmode_combox">
+          <item>
+           <property name="text">
+            <string>定位</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>跟踪</string>
+           </property>
+          </item>
+         </widget>
+        </item>
         <item row="1" column="6" colspan="2">
          <widget class="QCheckBox" name="track_checkBox">
           <property name="text">
            <string>目标跟踪</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="2">
+         <widget class="QCheckBox" name="fusion_checkBox">
+          <property name="text">
+           <string>双光融合</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="7">
+         <widget class="QLabel" name="camfocallen_label">
+          <property name="text">
+           <string>可见光焦距:</string>
           </property>
          </widget>
         </item>
@@ -260,17 +308,10 @@
           </item>
          </widget>
         </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="showvideo_label_2">
+        <item row="1" column="4" colspan="2">
+         <widget class="QCheckBox" name="detect_checkBox">
           <property name="text">
-           <string>显示画面:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="3" colspan="2">
-         <widget class="QLabel" name="sysmode_label_2">
-          <property name="text">
-           <string>系统状态:</string>
+           <string>目标检测</string>
           </property>
          </widget>
         </item>
@@ -284,31 +325,10 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="4" colspan="2">
-         <widget class="QCheckBox" name="detect_checkBox">
+        <item row="1" column="8">
+         <widget class="QPushButton" name="pushButton">
           <property name="text">
-           <string>目标检测</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="5" colspan="2">
-         <widget class="QComboBox" name="sysmode_combox">
-          <item>
-           <property name="text">
-            <string>定位</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>跟踪</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-        <item row="1" column="0" colspan="2">
-         <widget class="QCheckBox" name="fusion_checkBox">
-          <property name="text">
-           <string>双光融合</string>
+           <string>改变可见光焦距</string>
           </property>
          </widget>
         </item>
@@ -343,7 +363,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1280</width>
+     <width>1600</width>
      <height>26</height>
     </rect>
    </property>
