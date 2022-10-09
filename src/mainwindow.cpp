@@ -3,19 +3,20 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow),
-    m_isMousePress(false),
-    m_isdraw(true)
+    ui(new Ui::MainWindow)
+//    m_isMousePress(false),
+//    m_isdraw(true)
 {
     ui->setupUi(this);
     this->initApplication();
 
     ui->ip_lineEdit->setText("192.168.1.1");
 
-    ui->videoDispLabel->installEventFilter(this);
-    timer1 -> setTimerType(Qt::PreciseTimer);
-    connect(timer1,SIGNAL(timeout()),this,SLOT(sendcmd()));
+   // ui->videoDispLabel->installEventFilter(this);
+//    timer1 -> setTimerType(Qt::PreciseTimer);
+//    connect(timer1,SIGNAL(timeout()),this,SLOT(sendcmd()));
     //timer1->start(1000*60*3);
+    connect(ui->videoDispLabel,SIGNAL(emitbboox(QPoint,int,int)),this,SLOT(getbbox(QPoint,int,int)));
     camhandle = new camprotocol();
     decoder = new CH264Decoder();
     initwindow();
@@ -29,8 +30,8 @@ MainWindow::~MainWindow()
     delete ui;
     delete camhandle;
     delete decoder;
-    timer1->stop();
-    delete timer1;
+    //timer1->stop();
+    //delete timer1;
 }
 
 
@@ -103,7 +104,7 @@ void MainWindow::initwindow()
     setWindowState(Qt::WindowActive);
 }
 
-void MainWindow::updatebbox()
+void MainWindow::updatebbox(QPoint startpoint,int bbox_w,int bbox_h)
 {
     predata[10] = uchar(startpoint.x()>>8);
     predata[11] = startpoint.x()&0xff;
@@ -186,67 +187,67 @@ void MainWindow::updatebbox()
 
 
 
-bool MainWindow::eventFilter(QObject *obj, QEvent *event)
-{
-    if(obj==ui->videoDispLabel)
-    {
-        if(event->type()==QEvent::MouseButtonPress)
-        {
-            qDebug("mousepress");
-            m_isMousePress = true;
-            m_isdraw = true;
-            QMouseEvent *ev = static_cast<QMouseEvent *>(event);
-            startpoint = ev->pos();
-            qDebug()<<ev->pos();
-            return true;
-        }
+//bool MainWindow::eventFilter(QObject *obj, QEvent *event)
+//{
+//    if(obj==ui->videoDispLabel)
+//    {
+//        if(event->type()==QEvent::MouseButtonPress)
+//        {
+//            qDebug("mousepress");
+//            m_isMousePress = true;
+//            m_isdraw = true;
+//            QMouseEvent *ev = static_cast<QMouseEvent *>(event);
+//            startpoint = ev->pos();
+//            qDebug()<<ev->pos();
+//            return true;
+//        }
 
-        if(event->type()==QEvent::MouseMove)
-        {
-            if(m_isMousePress)
-                    {
-                        qDebug()<<"painting";
-                        QMouseEvent *ev = static_cast<QMouseEvent *>(event);
-                        finishpoint = ev->pos();
-                        update();
-                    }
-        }
+//        if(event->type()==QEvent::MouseMove)
+//        {
+//            if(m_isMousePress)
+//                    {
+//                        qDebug()<<"painting";
+//                        QMouseEvent *ev = static_cast<QMouseEvent *>(event);
+//                        finishpoint = ev->pos();
+//                        update();
+//                    }
+//        }
 
-        if(event->type()==QEvent::MouseButtonRelease)
-        {
-            qDebug("mouserelease");
+//        if(event->type()==QEvent::MouseButtonRelease)
+//        {
+//            qDebug("mouserelease");
 
-            QMouseEvent *ev = static_cast<QMouseEvent *>(event);
-            finishpoint = ev->pos();
-            m_isMousePress = false;
-            qDebug()<<ev->pos();
+//            QMouseEvent *ev = static_cast<QMouseEvent *>(event);
+//            finishpoint = ev->pos();
+//            m_isMousePress = false;
+//            qDebug()<<ev->pos();
 
-            return true;
-        }
-
-
-        if(event->type()==QEvent::KeyPress)
-        {
-            if(!m_isMousePress)
-            {
-             QKeyEvent *key_event=static_cast<QKeyEvent *>(event);
-             if (key_event->key() == Qt::Key_Escape)
-                 {
-
-                 }
-             if (key_event->key() == Qt::Key_Return || key_event->key() == Qt::Key_Enter)
-             {
-                updatebbox();
-             }
-            }
-        }
+//            return true;
+//        }
 
 
-        return false;
+//        if(event->type()==QEvent::KeyPress)
+//        {
+//            if(!m_isMousePress)
+//            {
+//             QKeyEvent *key_event=static_cast<QKeyEvent *>(event);
+//             if (key_event->key() == Qt::Key_Escape)
+//                 {
 
-    }
-    return eventFilter(obj,event);
-}
+//                 }
+//             if (key_event->key() == Qt::Key_Return || key_event->key() == Qt::Key_Enter)
+//             {
+//                updatebbox();
+//             }
+//            }
+//        }
+
+
+//        return false;
+
+//    }
+//    return eventFilter(obj,event);
+//}
 
 void MainWindow::sendcmd()
 {
@@ -254,33 +255,25 @@ void MainWindow::sendcmd()
 }
 
 
-void MainWindow::paintEvent(QPaintEvent *event)
-{
-//    if(m_isdraw)
+//void MainWindow::paintEvent(QPaintEvent *event)
+//{
+
+//    m_painter.begin(this);
+//    m_painter.setPen(QPen(Qt::blue, 1, Qt::SolidLine, Qt::FlatCap));
+//   // m_painter.setCompositionMode(QPainter::CompositionMode_DestinationOver);
+
+//    if (m_isMousePress)
 //    {
-    m_painter.begin(this);
-    m_painter.setPen(QPen(Qt::blue, 1, Qt::SolidLine, Qt::FlatCap));
-   // m_painter.setCompositionMode(QPainter::CompositionMode_DestinationOver);
-
-    if (m_isMousePress)
-    {
-        bbox_w = finishpoint.x()-startpoint.x();
-        bbox_h = finishpoint.y()-startpoint.y();
-        QRectF rectangle(startpoint.x(), startpoint.y(), bbox_w,  bbox_h);
-        qDebug()<< finishpoint.x()<<finishpoint.y();
-        m_painter.drawRect(rectangle);
-    }
-    ui->videoDispLabel->show();
-
-    m_painter.end();
-//    }
-
-//    else {
-//        m_painter.begin(this);
-//        m_painter.setCompositionMode(QPainter::CompositionMode_Clear);
+//        bbox_w = finishpoint.x()-startpoint.x();
+//        bbox_h = finishpoint.y()-startpoint.y();
+//        QRectF rectangle(startpoint.x(), startpoint.y(), bbox_w,  bbox_h);
+//        qDebug()<< finishpoint.x()<<finishpoint.y();
 //        m_painter.drawRect(rectangle);
 //    }
-}
+//    ui->videoDispLabel->show();
+
+//    m_painter.end();
+//}
 
 void MainWindow::rtsp_open()
 {
@@ -435,6 +428,11 @@ void MainWindow::getmsg(uchar num, qint16 x, qint16 y,quint16 dis,quint8 dis1)
             +"距离："+QString::number(dis)+"."+QString::number(dis1);
     //ui->videoDispLabel->setText(text);
     ui->statusBar->showMessage(text);
+}
+
+void MainWindow::getbbox(QPoint start, int w, int h)
+{
+    updatebbox(start,w,h);
 }
 
 void MainWindow::getshowbuff(uchar *buff,int len)

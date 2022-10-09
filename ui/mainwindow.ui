@@ -24,7 +24,7 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <widget class="QLabel" name="videoDispLabel">
+       <widget class="MyLabel" name="videoDispLabel">
         <property name="minimumSize">
          <size>
           <width>1280</width>
@@ -36,6 +36,9 @@
           <width>1280</width>
           <height>720</height>
          </size>
+        </property>
+        <property name="mouseTracking">
+         <bool>true</bool>
         </property>
         <property name="focusPolicy">
          <enum>Qt::StrongFocus</enum>
@@ -379,6 +382,13 @@
   <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>MyLabel</class>
+   <extends>QLabel</extends>
+   <header location="global">mylabel.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

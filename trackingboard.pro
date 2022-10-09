@@ -64,6 +64,7 @@ SOURCES += \
 #    src/rtspclient.cpp \
 #    src/mediasession.cpp
 #    src/ffmpeg.cpp
+    src/mylabel.cpp
 
 HEADERS += \
     include/mainwindow.h \
@@ -73,6 +74,7 @@ HEADERS += \
 #    include/rtspclient.h \
 #    include/mediasession.h
 #    include/ffmpeg.h
+    include/mylabel.h
 
 FORMS += \
     ui/mainwindow.ui

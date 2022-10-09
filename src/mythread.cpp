@@ -17,7 +17,7 @@ mythread::mythread()
 
 mythread::~mythread()
 {
-    //delete tcpsocket;
+    delete tcpsocket;
 }
 
 //void Delay(int msec)

@@ -4,7 +4,7 @@
 #include <QMainWindow>
 #include "camprotocol.h"
 #include <windows.h>
-#include <QPainter>
+#include "mylabel.h"
 #include <QMouseEvent>
 #include <QKeyEvent>
 #include <QEvent>
@@ -27,7 +27,7 @@ public:
 
     void initwindow();
 
-    void updatebbox();
+    void updatebbox(QPoint startpoint,int bbox_w,int bbox_h);
 
 //    void mousepress(QObject *obj,QEvent* event);
 
@@ -35,7 +35,7 @@ public:
 
 //    void mouserelease(QObject *obj,QMouseEvent* event);
 
-    void keypressEvent(QKeyEvent *event);
+    //void keypressEvent(QKeyEvent *event);
 
     AVPacket *pAVPacket = av_packet_alloc();
 
@@ -43,7 +43,7 @@ public:
 
     int cur_port;
 
-    void paintEvent(QPaintEvent *event);
+    //void paintEvent(QPaintEvent *event);
 
 
     void rtsp_open();
@@ -57,11 +57,13 @@ signals:
 private slots:
     void getmsg(uchar num,qint16 x,qint16 y,quint16 dis,quint8 dis1);
 
+    void getbbox(QPoint start,int w,int h);
+
     void getshowbuff(uchar *buff,int len);
 
     void Showpic(QImage image,int w,int h);
 
-    bool eventFilter(QObject *obj,QEvent *event);
+    //bool eventFilter(QObject *obj,QEvent *event);
 
     void sendcmd();
 
@@ -90,21 +92,21 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
-    QTimer *timer1 = new QTimer(this);
+   // QTimer *timer1 = new QTimer(this);
 
     void initApplication(void);
 
     camprotocol *camhandle;
     CH264Decoder *decoder;
 
-    QPainter m_painter;
-    QPoint startpoint;
-    QPoint finishpoint;
-    QRectF rectangle;
-    bool m_isMousePress;
-    bool m_isdraw;
-    int bbox_w;
-    int bbox_h;
+//    QPainter m_painter;
+ //   QPoint startpoint;
+//    QPoint finishpoint;
+//    QRectF rectangle;
+//    bool m_isMousePress;
+//    bool m_isdraw;
+//    int bbox_w;
+//    int bbox_h;
 };
 
 #endif // MAINWINDOW_H
