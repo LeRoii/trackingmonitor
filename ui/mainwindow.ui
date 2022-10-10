@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1280</width>
-    <height>767</height>
+    <width>1600</width>
+    <height>960</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -24,15 +24,36 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <widget class="QLabel" name="videoDispLabel">
+       <widget class="MyLabel" name="videoDispLabel">
         <property name="minimumSize">
          <size>
-          <width>1024</width>
-          <height>576</height>
+          <width>1280</width>
+          <height>720</height>
          </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>1280</width>
+          <height>720</height>
+         </size>
+        </property>
+        <property name="mouseTracking">
+         <bool>false</bool>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
         </property>
         <property name="text">
          <string/>
+        </property>
+        <property name="scaledContents">
+         <bool>true</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
         </property>
        </widget>
       </item>
@@ -71,14 +92,14 @@
           <item row="2" column="1" rowspan="2">
            <widget class="QLabel" name="cam_focal_lenth_status_label">
             <property name="text">
-             <string>5mm</string>
+             <string>x1</string>
             </property>
            </widget>
           </item>
           <item row="2" column="0" rowspan="2">
            <widget class="QLabel" name="cam_focal_lenth_label">
             <property name="text">
-             <string>可见光焦距:</string>
+             <string>可见光变焦倍数:</string>
             </property>
            </widget>
           </item>
@@ -137,10 +158,72 @@
           <property name="orientation">
            <enum>Qt::Vertical</enum>
           </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Preferred</enum>
+          </property>
           <property name="sizeHint" stdset="0">
            <size>
             <width>20</width>
             <height>30</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="groupBox">
+          <property name="title">
+           <string/>
+          </property>
+          <layout class="QFormLayout" name="formLayout">
+           <item row="0" column="0">
+            <widget class="QLabel" name="ip_lable">
+             <property name="text">
+              <string>目标ip</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLineEdit" name="ip_lineEdit">
+             <property name="minimumSize">
+              <size>
+               <width>112</width>
+               <height>0</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="port_label">
+             <property name="text">
+              <string>目标端口</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QLineEdit" name="port_lineEdit"/>
+           </item>
+           <item row="2" column="0">
+            <widget class="QPushButton" name="connect">
+             <property name="text">
+              <string>连接</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Preferred</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
            </size>
           </property>
          </spacer>
@@ -153,10 +236,17 @@
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
        <layout class="QGridLayout" name="gridLayout">
-        <item row="0" column="7">
-         <widget class="QLabel" name="camfocallen_label">
+        <item row="0" column="3" colspan="2">
+         <widget class="QLabel" name="sysmode_label_2">
           <property name="text">
-           <string>可见光焦距:</string>
+           <string>系统状态:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="showvideo_label_2">
+          <property name="text">
+           <string>显示画面:</string>
           </property>
          </widget>
         </item>
@@ -167,6 +257,20 @@
           </property>
          </widget>
         </item>
+        <item row="0" column="5" colspan="2">
+         <widget class="QComboBox" name="sysmode_combox">
+          <item>
+           <property name="text">
+            <string>定位</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>跟踪</string>
+           </property>
+          </item>
+         </widget>
+        </item>
         <item row="1" column="6" colspan="2">
          <widget class="QCheckBox" name="track_checkBox">
           <property name="text">
@@ -174,20 +278,43 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="1" colspan="2">
-         <widget class="QComboBox" name="showvideo_comboBox"/>
-        </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="showvideo_label_2">
+        <item row="1" column="0" colspan="2">
+         <widget class="QCheckBox" name="fusion_checkBox">
           <property name="text">
-           <string>显示画面:</string>
+           <string>双光融合</string>
           </property>
          </widget>
         </item>
-        <item row="0" column="3" colspan="2">
-         <widget class="QLabel" name="sysmode_label_2">
+        <item row="0" column="7">
+         <widget class="QLabel" name="camfocallen_label">
           <property name="text">
-           <string>系统状态:</string>
+           <string>可见光焦距:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1" colspan="2">
+         <widget class="QComboBox" name="showvideo_comboBox">
+          <item>
+           <property name="text">
+            <string>可见光</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>红外</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>融合</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="1" column="4" colspan="2">
+         <widget class="QCheckBox" name="detect_checkBox">
+          <property name="text">
+           <string>目标检测</string>
           </property>
          </widget>
         </item>
@@ -201,20 +328,10 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="4" colspan="2">
-         <widget class="QCheckBox" name="detect_checkBox">
+        <item row="1" column="8">
+         <widget class="QPushButton" name="pushButton">
           <property name="text">
-           <string>目标检测</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="5" colspan="2">
-         <widget class="QComboBox" name="sysmode_combox"/>
-        </item>
-        <item row="1" column="0" colspan="2">
-         <widget class="QCheckBox" name="fusion_checkBox">
-          <property name="text">
-           <string>双光融合</string>
+           <string>改变可见光焦距</string>
           </property>
          </widget>
         </item>
@@ -233,6 +350,13 @@
         </property>
        </spacer>
       </item>
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
    </layout>
@@ -242,7 +366,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1280</width>
+     <width>1600</width>
      <height>26</height>
     </rect>
    </property>
@@ -258,6 +382,13 @@
   <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>MyLabel</class>
+   <extends>QLabel</extends>
+   <header location="global">mylabel.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
