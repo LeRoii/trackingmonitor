@@ -52,14 +52,17 @@ void MyLabel::mouseMoveEvent(QMouseEvent *e)
 //鼠标抬起
 void MyLabel::mouseReleaseEvent(QMouseEvent *e)
 {
-    isPressed=false;
-    //update();
+
+   // isPressed=false;
+    EndPoint=e->pos();
+
 }
 
 void MyLabel::keyPressEvent(QKeyEvent *e)
 {
     if (e->key() == Qt::Key_Return || e->key() == Qt::Key_Enter)
     {
+        isPressed=false;
        qDebug()<< StartPoint.x()<<StartPoint.y()<<bbox_w<<bbox_h;
        emit emitbboox(StartPoint,bbox_w,bbox_h);
        MyLabel::clear();

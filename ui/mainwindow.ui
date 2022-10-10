@@ -38,7 +38,7 @@
          </size>
         </property>
         <property name="mouseTracking">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <property name="focusPolicy">
          <enum>Qt::StrongFocus</enum>
@@ -92,14 +92,14 @@
           <item row="2" column="1" rowspan="2">
            <widget class="QLabel" name="cam_focal_lenth_status_label">
             <property name="text">
-             <string>5mm</string>
+             <string>x1</string>
             </property>
            </widget>
           </item>
           <item row="2" column="0" rowspan="2">
            <widget class="QLabel" name="cam_focal_lenth_label">
             <property name="text">
-             <string>可见光焦距:</string>
+             <string>可见光变焦倍数:</string>
             </property>
            </widget>
           </item>
