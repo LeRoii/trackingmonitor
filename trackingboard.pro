@@ -37,14 +37,14 @@ LIBS += $$PWD/ffmpeg-5.0.1-full_build-shared/lib/avformat.lib   \
         $$PWD/ffmpeg-5.0.1-full_build-shared/lib/swscale.lib
 #        -L"D:\\ffmpeg-5.0.1-full_build-shared\bin"  -lavcodec-59 -lavdevice-59 -lavfilter-8 -lavformat-59 -lavutil-57 -lpostproc-56 -lswresample-4 -lswscale-6
 }
-LIBS += -L$$PWD../../ffmpeg-5.0.1-full_build-shared/bin -lavcodec-59
-LIBS += -L$$PWD../../ffmpeg-5.0.1-full_build-shared/bin -lavdevice-59
-LIBS += -L$$PWD../../ffmpeg-5.0.1-full_build-shared/bin -lavfilter-8
-LIBS += -L$$PWD../../ffmpeg-5.0.1-full_build-shared/bin -lavformat-59
-LIBS += -L$$PWD../../ffmpeg-5.0.1-full_build-shared/bin -lavutil-57
-LIBS += -L$$PWD../../ffmpeg-5.0.1-full_build-shared/bin -lpostproc-56
-LIBS += -L$$PWD../../ffmpeg-5.0.1-full_build-shared/bin -lswresample-4
-LIBS += -L$$PWD../../ffmpeg-5.0.1-full_build-shared/bin -lswscale-6
+LIBS += -L$$PWD/ffmpeg-5.0.1-full_build-shared/bin -lavcodec-59
+LIBS += -L$$PWD/ffmpeg-5.0.1-full_build-shared/bin -lavdevice-59
+LIBS += -L$$PWD/ffmpeg-5.0.1-full_build-shared/bin -lavfilter-8
+LIBS += -L$$PWD/ffmpeg-5.0.1-full_build-shared/bin -lavformat-59
+LIBS += -L$$PWD/ffmpeg-5.0.1-full_build-shared/bin -lavutil-57
+LIBS += -L$$PWD/ffmpeg-5.0.1-full_build-shared/bin -lpostproc-56
+LIBS += -L$$PWD/ffmpeg-5.0.1-full_build-shared/bin -lswresample-4
+LIBS += -L$$PWD/ffmpeg-5.0.1-full_build-shared/bin -lswscale-6
 
 # You can also make your code fail to compile if you use deprecated APIs.
 # In order to do so, uncomment the following line.
